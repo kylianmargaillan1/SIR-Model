@@ -7,8 +7,8 @@ from scipy.integrate import solve_ivp
 from matplotlib.widgets import Slider
 
 # Configuration de l'affichage de matplotlib
-# matplotlib.use('Qt5Agg') # A utiliser sur Linux
-matplotlib.use('TkAgg') # A utiliser sur Windows
+matplotlib.use('Qt5Agg')
+#matplotlib.use('TkAgg')
 
 
 # --- Fonctions ---
@@ -20,8 +20,8 @@ def deriv(_t, y, alpha, beta, gamma, micro, nu):
     S, E, I, R = y
     dSdt = -beta * S * I + nu * (S + E + I + R) - micro * S
     dEdt = beta * S * I - alpha * E - micro * E
-    dIdt = alpha * E - (gamma + micro) * I
-    dRdt = gamma * I - micro * R
+    dIdt = alpha * E - ((gamma + micro) * I)
+    dRdt = gamma * I - micro * R + nu * I
     return dSdt, dEdt, dIdt, dRdt
 
 
@@ -43,8 +43,8 @@ def update(_x):
 
 
 # --- Paramètres Initiaux ---
-SIM_TIME = 100  # Simulation time
-SIM_PRECISION = 20  # Samples per day
+SIM_TIME = 20  # Simulation time
+SIM_PRECISION = 100  # Samples per day
 
 N0 = 1000  # Population
 E0 = 0  # Nombre initial de personnes infectées non-infectieuses
@@ -54,10 +54,10 @@ S0 = N0 - (I0 + R0 + E0)  # Nombre initial de personnes Saines
 
 # Contact rate, beta, and mean recovery rate, gamma, (in 1/days).
 INIT_ALPHA = 0.75  # Taux d'incubation (0-1)
-INIT_BETA = 0.02  # Taux de transmission (0-1)
-INIT_GAMMA = 0.45  # Taux de guérison (0-1)
-INIT_MICRO = 0.2  # Taux de mortalité (0-1)
-INIT_NU = 0.25  # Taux de natalité (0-0.5)
+INIT_BETA = 0.1  # Taux de transmission (0-1)
+INIT_GAMMA = 0.05  # Taux de guérison (0-1)
+INIT_MICRO = 0.01  # Taux de mortalité (0-1)
+INIT_NU = 0.01  # Taux de natalité (0-0.5)
 
 # Une grille de points de temps (en jours)
 t = np.linspace(0, SIM_TIME, SIM_TIME * SIM_PRECISION)
@@ -88,7 +88,7 @@ ax.legend()
 # Slider Horizontal alpha
 alpha_slider = Slider(
     ax=plt.axes([0.1, 0.25, 0.8, 0.03], facecolor="lightgoldenrodyellow"),
-    label='α (Incubation)',
+    label='alpha (Incubation)',
     valmin=0,
     valmax=1,
     valinit=INIT_ALPHA,
@@ -120,7 +120,7 @@ micro_slider = Slider(
     ax=plt.axes([0.1, 0.10, 0.8, 0.03], facecolor="lightgoldenrodyellow"),
     label='μ (Mortalité)',
     valmin=0,
-    valmax=0.2,
+    valmax=0.013,
     valinit=INIT_MICRO,
     color="black"
 )
@@ -130,9 +130,9 @@ nu_slider = Slider(
     ax=plt.axes([0.1, 0.05, 0.8, 0.03], facecolor="lightgoldenrodyellow"),
     label='ν (Natalité)',
     valmin=0,
-    valmax=0.5,
+    valmax=0.013,
     valinit=INIT_NU,
-    color="pink"
+    color="white"
 )
 
 # register the update function with each slider
